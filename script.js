@@ -1,40 +1,37 @@
-async function loadMissions() {
-    const response = await fetch("missions.json");
-    const missions = await response.json();
+fetch("missions.json")
+    .then(response => response.json())
+    .then(data => {
+        const container = document.getElementById("missions-container");
 
-    const container = document.getElementById("missions-container");
-    container.innerHTML = "";
+        data.forEach(mission => {
+            const card = document.createElement("div");
+            card.className = "mission-card";
 
-    missions.sort((a, b) => a.level - b.level);
+            card.innerHTML = `
+                <h2>${mission.level}</h2>
 
-    missions.forEach(m => {
-        const card = document.createElement("div");
-        card.className = "mission-card";
+                <div class="section">
+                    <h3>Aufgaben</h3>
+                    <ul>
+                        ${mission.tasks.map(t => `<li>${t}</li>`).join("")}
+                    </ul>
+                </div>
 
-        card.innerHTML = `
-            <h2>Level ${m.level} – ${m.name}</h2>
+                <div class="section">
+                    <h3>Belohnung</h3>
+                    <ul>
+                        ${mission.rewards.map(r => `<li>${r}</li>`).join("")}
+                    </ul>
+                </div>
 
-            <strong>Aufgaben:</strong>
-            <ul class="task-list">
-                ${m.tasks.map(t => `<li>${t.text} (${t.amount})</li>`).join("")}
-            </ul>
+                <details class="details-box">
+                    <summary>Günstigste Lösung anzeigen</summary>
+                    <ul>
+                        ${mission.solution.map(s => `<li>${s}</li>`).join("")}
+                    </ul>
+                </details>
+            `;
 
-            <strong>Belohnung:</strong>
-            <ul class="reward-list">
-                <li>${m.rewards.xp} EP</li>
-                <li>${m.rewards.zd} Zoo-Dollar</li>
-            </ul>
-
-            <strong>Günstigste Lösung:</strong>
-            <ul class="cost-list">
-                <li>${m.cheapest_solution.shops.count}× ${m.cheapest_solution.shops.item} (${m.cheapest_solution.shops.price} ZD)</li>
-                <li>${m.cheapest_solution.enclosures.count}× ${m.cheapest_solution.enclosures.item} (${m.cheapest_solution.enclosures.price} ZD)</li>
-                <li><strong>Gesamtkosten: ${m.cheapest_solution.total_cost} ZD</strong></li>
-            </ul>
-        `;
-
-        container.appendChild(card);
+            container.appendChild(card);
+        });
     });
-}
-
-loadMissions();
